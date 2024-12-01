@@ -2,14 +2,20 @@
     body {
         margin: 0;
         background-color: black;
+        overflow: hidden;
     }
 </style>
-<p style="color: white; font-size: 20; margin-top: 10;
-margin-bottom: 10;">
-    <span>Score: </span><span>0</span>
+<body>
+<p style="color: white; font-size: 20px; margin-top: 10px;
+margin-bottom: 10px;">
+    <span>Next Pipe</span>
+    <span style="padding-left: 10px">Time Left: </span> <span id="timeElement">0</span>
+    <span style="padding-left: 10px">Score: </span><span id="scoreElement">00000</span>
+    <span style="padding-left: 10px">Distance: </span><span id="distanceElement">00</span>    
 </p>
 <canvas></canvas>
 <p>
     <button></button>
 </p>
 <script src="index.js"></script>
+</body>
