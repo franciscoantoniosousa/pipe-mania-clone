@@ -1,33 +1,56 @@
-const canvas = document.querySelector("canvas");
-const context = canvas.getContext("2d");
+const canvas = document.querySelector('canvas');
+const context = canvas.getContext('2d');
 
-const countdownElement = document.querySelector("#timeElement");
-const distanceElement = document.querySelector("#distanceElement");
-const scoreElement = document.querySelector("#scoreElement");
+const countdownElement = document.querySelector('#timeElement');
+const distanceElement = document.querySelector('#distanceElement');
+const scoreElement = document.querySelector('#scoreElement');
 
 const gameGridRows = 7;
 const gameGridColumns = 9;
-const uiOffsetY = -40;
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
+
+function resizeGame(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+
 // UI area offset
+const uiOffsetY = -160;
+const uiOffsetX = -160;
+const uiCoordsOffsetX = 2;
+
 
 const images = [
-  "", // 0
-  "./images/4-connector.png", // 1
-  "./images/bottom-left-curve.png", // 2
-  "./images/bottom-right-curve.png", // 3
-  "./images/top-left-curve.png", // 4
-  "./images/top-right-curve.png", // 5
-  "./images/horizontal.png", // 6
-  "./images/vertical.png", // 7
-  "./images/blocked-pipe.png", // 8
-  "./images/start-to-right.png", // 9
-  "./images/start-to-left.png", // 10
-  "./images/start-to-bottom.png", // 11
-  "./images/start-to-top.png", // 12
-  "./images/background.png", // 13
+  '', // 0
+  './images/base-pipes/4-connector.png', // 1
+  './images/base-pipes/bottom-left-curve.png', // 2
+  './images/base-pipes/bottom-right-curve.png', // 3
+  './images/base-pipes/top-left-curve.png', // 4
+  './images/base-pipes/top-right-curve.png', // 5
+  './images/base-pipes/horizontal.png', // 6
+  './images/base-pipes/vertical.png', // 7
+  './images/base-pipes/blocked-pipe.png', // 8
+  './images/base-pipes/start-to-right.png', // 9
+  './images/base-pipes/start-to-left.png', // 10
+  './images/base-pipes/start-to-bottom.png', // 11
+  './images/base-pipes/start-to-top.png', // 12
+  './images/background.png', // 13
+  './images/filled-pipes/4-connector-filled.png', // 14
+  './images/filled-pipes/4-connector-horizontal-half.png', // 15
+  './images/filled-pipes/4-connector-vertical-half.png', // 16
+  './images/filled-pipes/bottom-left-curve-filled.png', // 17
+  './images/filled-pipes/bottom-right-curve-filled.png', // 18
+  './images/filled-pipes/top-left-curve-filled.png', // 19
+  './images/filled-pipes/top-right-curve-filled.png', // 20
+  './images/filled-pipes/horizontal-filled.png', // 21
+  './images/filled-pipes/vertical-filled.png', // 22
+  './images/filled-pipes/start-to-right-filled.png', // 23
+  './images/filled-pipes/start-to-left-filled.png', // 24
+  './images/filled-pipes/start-to-bottom-filled.png', // 25
+  './images/filled-pipes/start-to-top-filled.png', // 26
+
 ];
 
 // Helper functions
@@ -49,42 +72,109 @@ class Cell {
   static cellWidth = 40;
   static cellHeight = 40;
 
-  constructor({ position, src, type }) {
+  constructor({position, src, type}) {
     this.position = position;
     this.width = 38;
     this.height = 38;
-    this.type = type;
-    const image = new Image();
-    image.src = src;
-    //console.log(this.image.src);
-    image.onload = () => {
-      this.image = image;
+
+    const pipeImage = new Image();
+    pipeImage.src = src;
+    pipeImage.onload = () => {
+      this.image = pipeImage;
     };
+
+    const pipeWithWaterImage = new Image();
+    pipeWithWaterImage.src = images[this.getPipeWithWaterImage(type)];
+    pipeWithWaterImage.onload = () => {
+      this.imageFilled = pipeWithWaterImage;
+    };
+    
+    this.withWater = false;
+    this.type = type;
+    this.alreadyFilled = false;
+  }
+
+  getPipeWithWaterImage(type) {
+    console.log('trying to get filled water pipe');
+    switch (type) {
+      case 1:
+        if(this.alreadyFilled === false){
+          this.alreadyFilled = true;
+          if (gameManager.currentPipe.direction === direction.Up || gameManager.currentPipe.direction === direction.Down) {
+            return 16;
+          } else {
+            return 15;
+          }         
+        }
+        return 14;
+      case 2:
+        return 17;
+      case 3:
+        return 18;
+      case 4:
+        return 19;
+      case 5:
+        return 20;
+      case 6:
+        return 21;
+      case 7:
+        return 22;
+      case 9:
+        return 23;
+      case 10:
+        return 24;
+      case 11:
+        return 25;
+      case 12:
+        return 26;
+    }
   }
 
   draw() {
-    if (this.image) {
+    const imageToDraw = this.withWater ? this.imageFilled : this.image;
+    if (imageToDraw) {
       context.drawImage(
-        this.image,
-        this.position.x,
-        this.position.y,
-        this.width,
-        this.height
+          imageToDraw,
+          this.position.x,
+          this.position.y,
+          this.width,
+          this.height
       );
     } else {
-      context.fillStyle = "rgb(255,201,14)";
+      context.fillStyle = 'rgb(255, 201, 14)';
       context.fillRect(
-        this.position.x,
-        this.position.y,
-        this.width,
-        this.height
+          this.position.x,
+          this.position.y,
+          this.width,
+          this.height
       );
     }
+  }
+  resize(newWidth, newHeight) {
+    const scaleX = newWidth / window.innerWidth;
+    const scaleY = newHeight / window.innerHeight;
+
+    // Adjust cell width and height based on window size
+    this.width = scaleX * Cell.cellWidth;
+    this.height = scaleY * Cell.cellHeight;
+
+    // Recalculate position (if necessary) based on the window size
+    this.position.x *= scaleX;
+    this.position.y *= scaleY;
   }
 }
 
 class GameManager {
   constructor() {
+
+    this.countdownTimer = 20;
+    this.currentPipe = {
+      x: 0,
+      y: 0,
+      direction: Direction.Up,
+    };
+    this.gameGrid = [];
+    this.gameStarted = false;
     this.grid = [
       [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -94,7 +184,7 @@ class GameManager {
       [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
-
+    this.loadingNextLevel = false;
     this.player = new Player({
       //  position is a coordinate in the grid
       position: {
@@ -103,127 +193,88 @@ class GameManager {
       },
     });
     this.nextPipes = [];
-    this.gameStarted = false;
-    this.currentPipe = {
-      x: 0,
-      y: 0,
-      lastDirection: Direction.Up,
-      type: 0, // image id to know the type of pipe
-    };
-
+    this.remainingDistance = randomIntFromInterval(4, 20);
     this.score = 0;
-    this.remainingDistance = 10;
-    this.countdownTimer = 20;
+    this.stopCountDown = false;
+    this.updateQueue = false;
+    this.isGameOver = false;
   }
 
   addPipe() {
     let nextPipeId = randomIntFromInterval(1, 7);
     this.nextPipes.push(nextPipeId);
-    console.log("Number of pipes", this.nextPipes.length);
-
-    if (this.gameStarted) {
-      gameGrid[11] = new Cell({
-        position: {
-          x: 0,
-          y: Cell.cellHeight,
-        },
-        src: images[this.nextPipes[3]],
-        type: this.nextPipes[3],
-      });
-      gameGrid[22] = new Cell({
-        position: {
-          x: 0,
-          y: Cell.cellHeight * 2,
-        },
-        src: images[this.nextPipes[2]],
-        type: this.nextPipes[2],
-      });
-      gameGrid[33] = new Cell({
-        position: {
-          x: 0,
-          y: Cell.cellHeight * 3,
-        },
-        src: images[this.nextPipes[1]],
-        type: this.nextPipes[1],
-      });
-      gameGrid[44] = new Cell({
-        position: {
-          x: 0,
-          y: Cell.cellHeight * 4,
-        },
-        src: images[this.nextPipes[0]],
-        type: this.nextPipes[0],
-      });
-    }
+    console.log('Number of pipes', this.nextPipes.length);
+    this.updateQueue = true;
   }
 
   canReceiveWater(type, direction) {
+    console.log('Direction', direction, ' Type', type);
     switch (type) {
       case 1: // 4 side pipe
         switch (direction) {
           case Direction.Down:
-            this.currentPipe.lastDirection = Direction.Up;
+            this.currentPipe.direction = Direction.Down;
             return true;
           case Direction.Up:
-            this.currentPipe.lastDirection = Direction.Down;
+            this.currentPipe.direction = Direction.Up;
             return true;
           case Direction.Left:
-            this.currentPipe.lastDirection = Direction.Right;
+            this.currentPipe.direction = Direction.Left;
             return true;
           case Direction.Right:
-            this.currentPipe.lastDirection = Direction.Left;
+            this.currentPipe.direction = Direction.Right;
             return true;
         }
         break;
       case 2: // bottom left curve
         switch (direction) {
-          case Direction.Down:
-          case Direction.Left:
-            return false;
           case Direction.Up:
-            this.currentPipe.lastDirection = Direction.Right;
-            return true;
           case Direction.Right:
-            this.currentPipe.lastDirection = Direction.Up;
+            return false;
+          case Direction.Down:
+            this.currentPipe.direction = Direction.Right;
+            return true;
+          case Direction.Left:
+            this.currentPipe.direction = Direction.Up;
             return true;
         }
         break;
       case 3: // bottom right curve
         switch (direction) {
-          case Direction.Down:
-          case Direction.Right:
-            return false;
           case Direction.Up:
-            this.currentPipe.lastDirection = Direction.Left;
-            return true;
           case Direction.Left:
-            this.currentPipe.lastDirection = Direction.Up;
+            return false;
+          case Direction.Down:
+            this.currentPipe.direction = Direction.Left;
+            return true;
+          case Direction.Right:
+            this.currentPipe.direction = Direction.Up;
             return true;
         }
         break;
       case 4: // top left curve
         switch (direction) {
-          case Direction.Down:
-            this.currentPipe.lastDirection = Direction.Right;
-            return true;
-          case Direction.Right:
-            this.currentPipe.lastDirection = Direction.Down;
-            return true;
           case Direction.Up:
+            this.currentPipe.direction = Direction.Right;
+            return true;
           case Direction.Left:
+            this.currentPipe.direction = Direction.Down;
+            return true;
+          case Direction.Down:
+          case Direction.Right:
             return false;
         }
         break;
       case 5: // top right curve
         switch (direction) {
-          case Direction.Down:
-            this.currentPipe.lastDirection = Direction.Left;
-            return true;
-          case Direction.Left:
-            this.currentPipe.lastDirection = Direction.Down;
-            return true;
           case Direction.Up:
+            this.currentPipe.direction = Direction.Left;
+            return true;
           case Direction.Right:
+            this.currentPipe.direction = Direction.Down;
+            return true;
+          case Direction.Down:
+          case Direction.Left:
             return false;
         }
         break;
@@ -233,67 +284,120 @@ class GameManager {
           case Direction.Up:
             return false;
           case Direction.Left:
-            this.currentPipe.lastDirection = Direction.Right;
+            this.currentPipe.direction = Direction.Left;
             return true;
           case Direction.Right:
-            this.currentPipe.lastDirection = Direction.Left;
+            this.currentPipe.direction = Direction.Right;
             return true;
         }
         break;
       case 7: // vertical
         switch (direction) {
           case Direction.Down:
-            this.currentPipe.lastDirection = Direction.Up;
+            this.currentPipe.direction = Direction.Down;
             return true;
           case Direction.Up:
-            this.currentPipe.lastDirection = Direction.Down;
+            this.currentPipe.direction = Direction.Up;
             return true;
           case Direction.Left:
           case Direction.Right:
             return false;
         }
         break;
-      // Blocked Pipe and starting positions cannot receive water
+        // Blocked Pipe and starting positions cannot receive water
       case 8:
+        console.log('Clogged Pipe');
+        return false;
       case 9:
       case 10:
       case 11:
       case 12:
+        console.log('Starting Pipe');
+        return false;
+      default:
+        console.log('There is no pipe on this cell');
         return false;
     }
   }
 
-  getNextPipeInStream() {
-    // get the current pipe type
-    let currentPipeType = this.grid[this.currentPipe.y][this.currentPipe.x];
+  drawPipeQueue() {
+    console.log('New Pipe in queue drawn');
+    this.gameGrid[11] = new Cell({
+      position: {
+        x: 0,
+        y: Cell.cellHeight,
+      },
+      src: images[this.nextPipes[3]],
+      type: this.nextPipes[3],
+    });
+    this.gameGrid[22] = new Cell({
+      position: {
+        x: 0,
+        y: Cell.cellHeight * 2,
+      },
+      src: images[this.nextPipes[2]],
+      type: this.nextPipes[2],
+    });
+    this.gameGrid[33] = new Cell({
+      position: {
+        x: 0,
+        y: Cell.cellHeight * 3,
+      },
+      src: images[this.nextPipes[1]],
+      type: this.nextPipes[1],
+    });
+    this.gameGrid[44] = new Cell({
+      position: {
+        x: 0,
+        y: Cell.cellHeight * 4,
+      },
+      src: images[this.nextPipes[0]],
+      type: this.nextPipes[0],
+    });
+    this.updateQueue = false;
+  }
 
+  gameOver() {
+    scoreElement.innerHTML = '';
+    distanceElement.innerHTML = '';
+    countdownElement.innerHTML = 'GAME OVER! Press Anywhere to restart the game!';
+  }
+
+  getNextPipeInStream() {
+    console.log('trying to fill next pipe');    
+    // get the current pipe type
+    let currentPipeGridId = this.currentPipe.y * 11 + this.currentPipe.x;
+    const currentPipe = this.gameGrid[currentPipeGridId];
+    currentPipe.withWater = true;
     // check for game over condition based on current pipe coords and direction
-    let isGameOver = false;
     switch (this.currentPipe.direction) {
       case Direction.Down:
         if (this.currentPipe.y + 1 >= gameGridRows) {
-          isGameOver = true;
+          this.isGameOver = true;
         }
         break;
       case Direction.Up:
         if (this.currentPipe.y - 1 < 0) {
-          isGameOver = true;
+          this.isGameOver = true;
         }
         break;
       case Direction.Left:
-        if (this.currentPipe.x - 1 < 2) {
-          isGameOver = true;
+        if (this.currentPipe.x - 1 < uiCoordsOffsetX) {
+          this.isGameOver = true;
         }
         break;
       case Direction.Right:
-        if (this.currentPipe.x + 1 >= gameGridColumns + 2) {
-          isGameOver = true;
+        if (this.currentPipe.x + 1 >= gameGridColumns + uiCoordsOffsetX) {
+          this.isGameOver = true;
         }
         break;
     }
+    console.log('Check if current pipe is sending water out of the game grid:',
+        this.isGameOver);
 
-    if (isGameOver) {
-      //this.gameOver();
+    if (this.isGameOver && this.loadingNextLevel === false) {
+      console.log('Game over, sent water out of grid');
+      this.gameOver();
       return;
     }
 
@@ -327,42 +431,130 @@ class GameManager {
         break;
     }
 
+    console.log('next pipe coords: ', nextPipeCoords.x, nextPipeCoords.y);
+
     /*check if water can flow to the next pipe.
      *return value will dictate game over condition, if it's not game over the direction of the next pipe is already
      *set through this function*/
-    if (
-      this.canReceiveWater(nextPipeType, this.currentPipe.lastDirection) ===
-      false
-    ) {
-      console.log(
-        "Game Over, the next pipe cannot receive water from the previous pipe)"
-      );
-      // this.gameOver();
+    if (this.canReceiveWater(nextPipeType, this.currentPipe.direction) === false) {
+      this.isGameOver = true;
+      if (this.loadingNextLevel === false) {
+        console.log(
+            'Game Over, the next pipe cannot receive water from the previous pipe', this.isGameOver);
+        this.gameOver();
+      }
+      return;
     }
-
+    console.log('Next Pipe was filled with water!!!');
     // advance water to current pipe
     this.currentPipe.x = nextPipeCoords.x;
     this.currentPipe.y = nextPipeCoords.y;
-    this.currentPipe.type = nextPipeType;
-    this.currentPipe.direction = Direction.Down;
 
     // Check score
     this.score += 100;
     this.remainingDistance--;
+    scoreElement.innerHTML = `Score: ${this.score}`;
+    distanceElement.innerHTML = `Distance: ${this.remainingDistance}`;
+
+    // Go to next level if the user completes the required distance
+    if (this.remainingDistance <= 0 && this.loadingNextLevel === false) {
+      this.stopCountDown = true;
+      this.nextLevel();
+    }
+  }
+
+  nextLevel() {
+    console.log('Next Level');
+    // go through all the remaining aligned pipes to give score to the user, if it reaches a dead end avoid a game over
+    this.loadingNextLevel = true;
+    // Get next pipe to score until its "game over"
+    while (this.isGameOver === false) {
+      this.getNextPipeInStream();
+    }
+    // reset "game over"
+    this.isGameOver = false;
+
+    // subtract score for every pipe not used in the pipe stream
+    this.gameGrid.forEach((currentPipe)=>{
+      if(currentPipe.type >= 1 && currentPipe.type <= 7){
+        if(currentPipe.withWater === false){
+          console.log('Penalized 50 for not using a pipe');
+          this.score -= 50;
+        }
+      }
+    })
+    // Small Countdown coroutine to give the user some feedback
+    scoreElement.innerHTML = '';
+    distanceElement.innerHTML = '';
+
+    const countdownTimer = setInterval(() => {
+      console.log('countDown: ', this.countdownTimer);
+      // Update the countdown display
+      countdownElement.innerHTML = `Going to next level in: ${this.countdownTimer}`;
+      if (this.countdownTimer <= 0) {
+        // Stop the timer
+        clearInterval(countdownTimer);
+        this.restartGame(true);
+      } else {
+        // Decrease the countdown
+        this.countdownTimer--;
+      }
+    }, 1000); // Run every 1 second
+
+  }
+
+  restartGame(keepScore) {
+    this.countdownTimer = 20;
+    this.currentPipe = {
+      x: 0,
+      y: 0,
+      direction: Direction.Up,
+    };
+    this.gameGrid = [];
+    this.gameStarted = false;
+    this.grid = [
+      [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+    this.loadingNextLevel = false;
+    this.player = new Player({
+      //  position is a coordinate in the grid
+      position: {
+        x: 5,
+        y: 5,
+      },
+    });
+    this.nextPipes = [];
+    this.remainingDistance = randomIntFromInterval(4, 20);
+    if (keepScore === false) {
+      this.score = 0;
+    }
+    this.stopCountDown = false;
+    this.updateQueue = false;
+    this.isGameOver = false;
+    this.startGame();
   }
 
   setPipePosition(mouseX, mouseY) {
     // get the player coords in the grid
     let newPlayerPositionX = Math.floor(mouseX / Cell.cellWidth);
     let newPlayerPositionY = Math.floor(mouseY / Cell.cellHeight);
-    // check if the mouse click was within the gamming area
-    if (newPlayerPositionX >= 2 && newPlayerPositionX < gameGridColumns + 2) {
+    // check if the mouse click was within the gaming area
+    if (
+        newPlayerPositionX >= uiCoordsOffsetX &&
+        newPlayerPositionX < gameGridColumns + uiCoordsOffsetX
+    ) {
       if (newPlayerPositionY >= 0 && newPlayerPositionY < gameGridRows) {
         // check if this coord can be played, not a bloc pipe nor starting pipe
         for (let index = 8; index <= 12; index++) {
           if (this.grid[newPlayerPositionY][newPlayerPositionX] === index) {
             console.log(
-              "Cannot place pipe in this position, its a blocked pipe or starting pipe"
+                'Cannot place pipe in this position, its a blocked pipe or starting pipe',
             );
             return;
           }
@@ -370,25 +562,27 @@ class GameManager {
 
         // set this grid value to be the nextPipe
         this.grid[newPlayerPositionY][newPlayerPositionX] =
-          this.nextPipes.shift();
+            this.nextPipes.shift();
         // generate a new random pipe and add it to the queue
         this.addPipe();
-        //  set the gameGrid with the new cell (This should be overiden and not a new instance, cant find a proper way to this in js)
+        //  set the gameGrid with the new cell (This should be overriden and not a new instance, cant find a proper way to this in js)
         let pressedCellId =
-          newPlayerPositionY * (gameGridColumns + 2) + newPlayerPositionX;
-        gameGrid[pressedCellId] = new Cell({
+            newPlayerPositionY * (gameGridColumns + uiCoordsOffsetX) +
+            newPlayerPositionX;
+        
+        this.gameGrid[pressedCellId] = new Cell({
           position: {
             x: Cell.cellWidth * newPlayerPositionX,
             y: Cell.cellHeight * newPlayerPositionY,
           },
           src: images[this.grid[newPlayerPositionY][newPlayerPositionX]],
-          type: this.grid[newPlayerPositionY][newPlayerPositionX],
+          type: this.grid[newPlayerPositionY][newPlayerPositionX]
         });
 
         console.log(
-          "Pipe was played on coords:",
-          newPlayerPositionY,
-          newPlayerPositionX
+            'Pipe was played on coords:',
+            newPlayerPositionY,
+            newPlayerPositionX,
         );
       }
     }
@@ -396,14 +590,18 @@ class GameManager {
 
   startCountdown() {
     const countdownTimer = setInterval(() => {
-      console.log("countDown second");
+      if(this.isGameOver){
+        clearInterval(countdownTimer);
+        return;
+      }
+      console.log('countDown: ', this.countdownTimer);
       // Update the countdown display
-      countdownElement.innerHTML = this.countdownTimer;
+      countdownElement.innerHTML = `Time Left: ${this.countdownTimer}`;
       if (this.countdownTimer <= 0) {
         // Stop the timer
         clearInterval(countdownTimer);
         // Start the game/water flow
-        startWaterFlow();
+        this.startWaterFlow();
       } else {
         // Decrease the countdown
         this.countdownTimer--;
@@ -412,16 +610,24 @@ class GameManager {
   }
 
   startGame() {
+    scoreElement.innerHTML = `Score: ${this.score}`;
+    distanceElement.innerHTML = `Distance: ${this.remainingDistance}`;
+    countdownElement.innerHTML = `Time Left: ${this.countdownTimer}`;
+    this.stopCountDown = false;
+
     // set grid
-    console.log("Initialize");
+    console.log('Initialize');
     // set blocked cells - image id - 8 - set a random number of blocks between 1 - 4
     const numberBlockedCells = randomIntFromInterval(0, 4);
     for (let index = 0; index < numberBlockedCells; index++) {
       // -1 since its id 0
       let rowPosition = randomIntFromInterval(0, gameGridRows - 1);
-      let columnPosition = randomIntFromInterval(2, gameGridColumns + 1);
+      let columnPosition = randomIntFromInterval(
+          uiCoordsOffsetX,
+          gameGridColumns + 1,
+      );
       this.grid[rowPosition][columnPosition] = 8;
-      console.log("blockedCell", rowPosition, columnPosition);
+      console.log('blockedCell', rowPosition, columnPosition);
     }
 
     // set the starting point - random number between 9 - 12 (starting point image id's)
@@ -441,10 +647,11 @@ class GameManager {
         switch (initialPipeType) {
           case 9:
             let nextColumnId = columnPosition + 1;
-            console.log("next column: ", nextColumnId);
+            console.log('next column: ', nextColumnId);
             // water flow direction is not out of map or a blocked cell
-            if (nextColumnId < gameGridColumns + 2) {
+            if (nextColumnId < gameGridColumns + uiCoordsOffsetX) {
               if (this.grid[rowPosition][nextColumnId] !== 8) {
+
                 canSetStartingPipe = true;
               }
             }
@@ -453,7 +660,7 @@ class GameManager {
           case 10:
             let previousColumnId = columnPosition - 1;
             // water flow direction is not out of map or a blocked cell
-            if (previousColumnId >= 2) {
+            if (previousColumnId >= uiCoordsOffsetX) {
               if (this.grid[rowPosition][previousColumnId] !== 8) {
                 canSetStartingPipe = true;
               }
@@ -483,7 +690,6 @@ class GameManager {
           this.grid[rowPosition][columnPosition] = initialPipeType;
           this.currentPipe.y = rowPosition;
           this.currentPipe.x = columnPosition;
-          this.currentPipe.type = initialPipeType;
           switch (initialPipeType) {
             case 9:
               this.currentPipe.direction = Direction.Right;
@@ -499,26 +705,28 @@ class GameManager {
               break;
           }
           console.log(
-            "Starting pipe of type: ",
-            initialPipeType,
-            ". was set on position: ",
-            rowPosition,
-            columnPosition
+              'Starting pipe of type: ',
+              initialPipeType,
+              '. was set on position: ',
+              rowPosition,
+              columnPosition,
+              'with starting direction: ',
+              this.currentPipe.direction,
           );
           initialIsSet = true;
         } else {
           console.log(
-            "pipe type: ",
-            initialPipeType,
-            "could not place pipe here:",
-            columnPosition,
-            rowPosition,
-            "water would flow out of the map"
+              'pipe type: ',
+              initialPipeType,
+              'could not place pipe here:',
+              columnPosition,
+              rowPosition,
+              'water would flow out of the map',
           );
         }
       } else {
         // debug purpose to check if this ever happened
-        console.log("Could not set initial pipe here");
+        console.log('Could not set initial pipe here');
       }
     }
     // generate the queue with 4 new blocks - image id's - 1 -7
@@ -527,23 +735,73 @@ class GameManager {
     }
 
     this.gameStarted = true;
+
+    // set each cell pipeType /  or empty cell
+    this.grid.forEach((row, currentRow) => {
+      row.forEach((column, currentColumn) => {
+        this.gameGrid.push(
+            new Cell({
+              position: {
+                x: Cell.cellWidth * currentColumn,
+                y: Cell.cellHeight * currentRow,
+              },
+              src: images[column],
+              type: column,
+            }),
+        );
+      });
+    });
     // start water flow countdown
     this.startCountdown();
   }
 
-  startWaterFlow() {}
+  startWaterFlow() {
+    console.log('StartWaterFlow');
+
+    // set the next pipe to be filled     
+    const countdownTimer = setInterval(() => {
+      if(this.isGameOver){
+        clearInterval(countdownTimer);
+        return;
+      }
+      console.log('water flow countDown: ', this.countdownTimer);
+      // Update the countdown display
+      countdownElement.innerHTML = `Time Left: ${this.countdownTimer}`;
+      if (this.isGameOver || this.stopCountDown) {
+        console.log('Game Over, stop water flow timer');
+        clearInterval(countdownTimer);
+        return;
+      }
+      if (this.countdownTimer <= 0) {
+        // restart the timer
+        this.countdownTimer = 3;
+        // Start the game/water flow
+        this.getNextPipeInStream();
+      } else {
+        // Decrease the countdown
+        this.countdownTimer--;
+      }
+    }, 1000); // Run every 1 second
+  }
 
   update() {
     if (this.gameStarted === false) {
-      this.startGame();
+      return;
     }
     // Update player position
     this.player.update();
+    if (this.gameStarted && this.updateQueue) {
+      this.drawPipeQueue();
+    }
+    // draw the cells
+    for (const cell in this.gameGrid) {
+      this.gameGrid[cell].draw();
+    }
   }
 }
 
 class Player {
-  constructor({ position }) {
+  constructor({position}) {
     this.position = position;
     this.width = Cell.cellWidth;
     this.height = Cell.cellHeight;
@@ -552,13 +810,13 @@ class Player {
 
   draw() {
     context.lineWidth = 3;
-    context.strokeStyle = "red";
+    context.strokeStyle = 'red';
     // position is a coordinate, multiply by the cell size, -1 in width and height to center with the grid
     context.strokeRect(
-      this.position.x * Cell.cellWidth - 1,
-      this.position.y * Cell.cellHeight - 1,
-      this.width,
-      this.height
+        this.position.x * Cell.cellWidth - 1,
+        this.position.y * Cell.cellHeight - 1,
+        this.width,
+        this.height,
     );
   }
 
@@ -573,24 +831,6 @@ class Player {
 // fields
 // gameGrid
 const gameManager = new GameManager();
-const gameGrid = [];
-gameManager.startGame();
-
-// set each cell pipeType /  or empty cell
-gameManager.grid.forEach((row, currentRow) => {
-  row.forEach((column, currentColumn) => {
-    gameGrid.push(
-      new Cell({
-        position: {
-          x: Cell.cellWidth * currentColumn,
-          y: Cell.cellHeight * currentRow,
-        },
-        src: images[column],
-        type: column,
-      })
-    );
-  });
-});
 
 // Game Loop
 function gameLoop() {
@@ -599,55 +839,55 @@ function gameLoop() {
 
   // draw player position
   gameManager.update();
-  // draw the cells
-  for (const cell in gameGrid) {
-    gameGrid[cell].draw();
-  }
 }
 
 gameLoop();
 
-window.addEventListener("keydown", ({ key }) => {
-  console.log(key);
-  switch (key) {
-    case "w":
-      if (gameManager.player.position.y - 1 >= 0) {
-        gameManager.player.position.y -= 1;
-      }
-      break;
-    case "s":
-      if (gameManager.player.position.y + 1 < gameGridRows) {
-        gameManager.player.position.y += 1;
-      }
-      break;
-    case "a":
-      if (gameManager.player.position.x - 1 >= 0) {
-        gameManager.player.position.x -= 1;
-      }
-      break;
-    case "d":
-      if (gameManager.player.position.x + 1 < gameGridColumns) {
-        gameManager.player.position.x += 1;
-      }
-      break;
+window.addEventListener('mousedown', (mouse) => {
+  if (gameManager.gameStarted && gameManager.isGameOver === false) {
+    gameManager.setPipePosition(mouse.clientX + uiOffsetX, mouse.clientY + uiOffsetY);
+    return;
   }
+  // Click anywhere on screen to restart the game
+    console.log('Started Game on Click!');
+    gameManager.restartGame(false);
 });
 
-window.addEventListener("mousedown", (mouse) => {
-  gameManager.setPipePosition(mouse.clientX, mouse.clientY + uiOffsetY);
-});
-
-window.addEventListener("mousemove", (mouse) => {
-  let newPlayerPositionX = Math.floor(mouse.clientX / Cell.cellWidth);
-  let newPlayerPositionY = Math.floor(
-    (mouse.clientY + uiOffsetY) / Cell.cellHeight
-  );
-  if (newPlayerPositionX >= +2 && newPlayerPositionX < gameGridColumns + 2) {
-    if (newPlayerPositionY >= 0 && newPlayerPositionY < gameGridRows) {
-      //console.log("Hovering different cell");
-      gameManager.player.position.x = newPlayerPositionX;
-      gameManager.player.position.y = newPlayerPositionY;
-      gameManager.player.moved = true;
+window.addEventListener('mousemove', (mouse) => {
+  if (gameManager.gameStarted) {
+    let newPlayerPositionX = Math.floor((mouse.clientX + uiOffsetX) / Cell.cellWidth);
+    let newPlayerPositionY = Math.floor(
+        (mouse.clientY + uiOffsetY) / Cell.cellHeight,
+    );
+    if (
+        newPlayerPositionX >= uiCoordsOffsetX &&
+        newPlayerPositionX < gameGridColumns + uiCoordsOffsetX
+    ) {
+      if (newPlayerPositionY >= 0 && newPlayerPositionY < gameGridRows) {
+        //console.log("Hovering different cell");
+        gameManager.player.position.x = newPlayerPositionX;
+        gameManager.player.position.y = newPlayerPositionY;
+        gameManager.player.moved = true;
+      }
     }
   }
+
+  if (gameManager.isGameOver === false && gameManager.gameStarted === false) {
+    scoreElement.innerHTML = '';
+    distanceElement.innerHTML = '';
+    countdownElement.innerHTML = 'Press Anywhere to start the game!';
+  }
+});
+
+
+window.addEventListener('resize',  () => {
+  const newWidth = window.innerWidth;
+  const newHeight = window.innerHeight;
+
+  // Resize all cells
+  gameManager.gameGrid.forEach(cell => cell.resize(newWidth, newHeight));
+
+  // Redraw the updated cells
+  context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+  gameManager.gameGrid.forEach(cell => cell.draw()); // Redraw each resized cell
 });

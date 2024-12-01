@@ -4,18 +4,21 @@
         background-color: black;
         overflow: hidden;
     }
+    .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
 </style>
-<body>
+<body >
 <p style="color: white; font-size: 20px; margin-top: 10px;
-margin-bottom: 10px;">
-    <span>Next Pipe</span>
-    <span style="padding-left: 10px">Time Left: </span> <span id="timeElement">0</span>
-    <span style="padding-left: 10px">Score: </span><span id="scoreElement">00000</span>
-    <span style="padding-left: 10px">Distance: </span><span id="distanceElement">00</span>    
+margin-bottom: 10px; padding-left: 160px; padding-top: 120px"  >
+    <span class="no-select">Next Pipe</span>
+    <span class="no-select" style="padding-left: 10px" id="timeElement">0</span>
+    <span class="no-select" id="scoreElement" style="padding-left: 10px">00000 </span>
+    <span class="no-select" style="padding-left: 10px" id="distanceElement">00</span>    
 </p>
-<canvas></canvas>
-<p>
-    <button></button>
-</p>
+<canvas style="padding-left: 160px; "></canvas>
 <script src="index.js"></script>
 </body>
