@@ -4,13 +4,13 @@ import {Direction} from './eDirection';
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 export class Cell {
-  static cellWidth = 40;
-  static cellHeight = 40;
+  static cellWidth = 70;
+  static cellHeight = 70;
 
   constructor({gameManager,position, src, type}) {
     this.position = position;
-    this.width = 38;
-    this.height = 38;
+    this.width = 68;
+    this.height = 68;
     this.gameManager = gameManager;
 
     const pipeImage = new Image();

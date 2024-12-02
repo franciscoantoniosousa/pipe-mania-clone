@@ -636,7 +636,7 @@ export class GameManager {
         // Decrease the countdown
         this.countdownTimer--;
       }
-    }, 1000); // Run every 1 second
+    }, 500); // Run every 1 second
   }
 
   update() {
