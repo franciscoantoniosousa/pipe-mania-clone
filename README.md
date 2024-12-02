@@ -20,7 +20,7 @@ This is a browser-based puzzle game inspired by the classic *Pipe Mania*. The ob
 ## Deployed Version
 You can play the game online at the following link:
 
-[Pipe Mania Clone (Deployed)](https://rainbow-cuchufli-c9343a.netlify.app/)
+[Pipe Mania Clone (Deployed)](https://pipe-mania-clone.netlify.app)
 
 ## Technologies Used
 - JavaScript (ES6+)
