@@ -30,3 +30,69 @@ You can play the game online at the following link:
 
 ## Contributing
 Feel free to fork this project and submit issues or pull requests if you have suggestions or improvements.
+
+# Running the Project Locally
+
+To run the project locally on your machine, follow these steps:
+
+## 1. Clone the Repository
+First, clone the repository to your local machine using the following command:
+
+```bash
+git clone https://github.com/yourusername/your-repo-name.git
+```
+
+Replace `https://github.com/yourusername/your-repo-name.git` with the actual URL of your repository.
+
+## 2. Switch to the `distributable` Branch
+After cloning the repository, change to the `distributable` branch. This branch contains the latest production-ready code for local development.
+
+```bash
+cd your-repo-name
+git checkout distributable
+```
+
+Replace `your-repo-name` with the actual folder name of the cloned repository.
+
+## 3. Install Dependencies
+If you haven't already installed the dependencies, you need to run the following command to install them:
+
+```bash
+npm install
+```
+
+This will install all the necessary packages specified in the `package.json` file, including Webpack and other dependencies.
+
+## 4. Run the Development Server
+Once the dependencies are installed, you can start the development server using Webpack by running:
+
+```bash
+npx webpack serve
+```
+
+This command will:
+- Start the Webpack Dev Server on your local machine.
+- Open the application in your default browser.
+- Serve the app at `http://localhost:8080/` by default (you can change the port in the Webpack configuration if needed).
+
+> **Note**: `npx` comes with npm (version 5.2.0 and above). If you're using an older version of npm, you may need to update npm first.
+
+## 5. Access the Application
+After running `npx webpack serve`, you should see output in your terminal indicating that the server is running. Open your browser and go to:
+
+```
+http://localhost:8080
+```
+
+You should see the application running locally on your machine.
+
+---
+
+## Troubleshooting
+- **If you get an error saying `npx: command not found`**, ensure that you have `npm` installed correctly. You can install or update npm by running:
+  
+  ```bash
+  npm install -g npm
+  ```
+
+- **If the server is not opening automatically in the browser**, manually open your browser and navigate to `http://localhost:8080`.
