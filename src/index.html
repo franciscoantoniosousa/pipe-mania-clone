@@ -4,6 +4,7 @@
         background-color: black;
         overflow: hidden;
     }
+
     .no-select {
         user-select: none;
         -webkit-user-select: none;
@@ -11,14 +12,19 @@
         -ms-user-select: none;
     }
 </style>
-<body >
+<html lang="en">
+<body>
 <p style="color: white; font-size: 20px; margin-top: 10px;
-margin-bottom: 10px; padding-left: 160px; padding-top: 120px"  >
+margin-bottom: 10px; padding-left: 160px; padding-top: 120px">
     <span class="no-select">Next Pipe</span>
     <span class="no-select" style="padding-left: 10px" id="timeElement">0</span>
     <span class="no-select" id="scoreElement" style="padding-left: 10px">00000 </span>
-    <span class="no-select" style="padding-left: 10px" id="distanceElement">00</span>    
+    <span class="no-select" style="padding-left: 10px" id="distanceElement">00</span>
 </p>
 <canvas style="padding-left: 160px; "></canvas>
 <script src="index.js"></script>
+
+
 </body>
+
+</html>
