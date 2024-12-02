@@ -11,11 +11,6 @@ const gameGridColumns = 9;
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-function resizeGame(){
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-}
-
 // UI area offset
 const uiOffsetY = -160;
 const uiOffsetX = -160;
