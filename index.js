@@ -19,6 +19,7 @@ function resizeGame(){
 // UI area offset
 const uiOffsetY = -160;
 const uiOffsetX = -160;
+// Offset of the next pipe queue
 const uiCoordsOffsetX = 2;
 
 
@@ -151,16 +152,18 @@ class Cell {
     }
   }
   resize(newWidth, newHeight) {
-    const scaleX = newWidth / window.innerWidth;
-    const scaleY = newHeight / window.innerHeight;
-
-    // Adjust cell width and height based on window size
-    this.width = scaleX * Cell.cellWidth;
-    this.height = scaleY * Cell.cellHeight;
-
-    // Recalculate position (if necessary) based on the window size
-    this.position.x *= scaleX;
-    this.position.y *= scaleY;
+    // Tried to figure out how to dynamically change the graphic size when window is resized but was not successful    
+    
+    // const scaleX = newWidth / window.innerWidth;
+    // const scaleY = newHeight / window.innerHeight;
+    //
+    // // Adjust cell width and height based on window size
+    // this.width = scaleX * Cell.cellWidth;
+    // this.height = scaleY * Cell.cellHeight;
+    //
+    // // Recalculate position (if necessary) based on the window size
+    // this.position.x *= scaleX;
+    // this.position.y *= scaleY;
   }
 }
 
