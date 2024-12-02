@@ -31,11 +31,11 @@ You can play the game online at the following link:
 ## Contributing
 Feel free to fork this project and submit issues or pull requests if you have suggestions or improvements.
 
-# Running the Project Locally
+## Running the Project Locally
 
 To run the project locally on your machine, follow these steps:
 
-## 1. Clone the Repository
+### 1. Clone the Repository
 First, clone the repository to your local machine using the following command:
 
 ```bash
@@ -63,7 +63,7 @@ npm install
 
 This will install all the necessary packages specified in the `package.json` file, including Webpack and other dependencies.
 
-## 4. Run the Development Server
+### 4. Run the Development Server
 Once the dependencies are installed, you can start the development server using Webpack by running:
 
 ```bash
@@ -88,7 +88,7 @@ You should see the application running locally on your machine.
 
 ---
 
-## Troubleshooting
+### Troubleshooting
 - **If you get an error saying `npx: command not found`**, ensure that you have `npm` installed correctly. You can install or update npm by running:
   
   ```bash
