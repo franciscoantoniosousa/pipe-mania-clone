@@ -25,7 +25,6 @@ You can play the game online at the following link:
 ## Technologies Used
 - JavaScript (ES6+)
 - HTML5
-- CSS3
 - Webpack (for bundling)
 - Netlify (for deployment)
 
