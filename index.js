@@ -65,13 +65,13 @@ const Direction = {
 
 // Classes
 class Cell {
-  static cellWidth = 40;
-  static cellHeight = 40;
+  static cellWidth = 70;
+  static cellHeight = 70;
 
   constructor({position, src, type}) {
     this.position = position;
-    this.width = 38;
-    this.height = 38;
+    this.width = 68;
+    this.height = 68;
 
     const pipeImage = new Image();
     pipeImage.src = src;
@@ -779,7 +779,7 @@ class GameManager {
         // Decrease the countdown
         this.countdownTimer--;
       }
-    }, 1000); // Run every 1 second
+    }, 500); // Run every 1 second
   }
 
   update() {
