@@ -31,6 +31,3 @@ You can play the game online at the following link:
 
 ## Contributing
 Feel free to fork this project and submit issues or pull requests if you have suggestions or improvements.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
